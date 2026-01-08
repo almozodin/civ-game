@@ -45,8 +45,14 @@ const params = {
 const scenarios = [
   {
     id: "baseline",
-    title: "默认危机：软着陆试验",
-    description: "通胀高企但外储尚可，信誉处于修复窗口。",
+    title: {
+      zh: "默认危机：软着陆试验",
+      en: "Baseline Crisis: Soft Landing Trial"
+    },
+    description: {
+      zh: "通胀高企但外储尚可，信誉处于修复窗口。",
+      en: "Inflation is elevated but reserves are intact, credibility is repairable."
+    },
     initial: {
       y: -2,
       pi: 16,
@@ -63,8 +69,14 @@ const scenarios = [
   },
   {
     id: "fragile",
-    title: "脆弱高通胀：预期脱锚",
-    description: "预期已经漂移，外汇储备偏低，风险溢价敏感。",
+    title: {
+      zh: "脆弱高通胀：预期脱锚",
+      en: "Fragile Inflation: Expectations Unanchored"
+    },
+    description: {
+      zh: "预期已经漂移，外汇储备偏低，风险溢价敏感。",
+      en: "Expectations are drifting, reserves are low, risk premia are sensitive."
+    },
     initial: {
       y: -3.5,
       pi: 28,
@@ -84,26 +96,26 @@ const scenarios = [
 const factions = [
   {
     id: "workers",
-    name: "民众与工会",
-    focus: "就业与购买力",
+    name: { zh: "民众与工会", en: "Workers & Unions" },
+    focus: { zh: "就业与购买力", en: "Jobs & purchasing power" },
     base: 55
   },
   {
     id: "business",
-    name: "企业与出口商",
-    focus: "增长与融资成本",
+    name: { zh: "企业与出口商", en: "Businesses & Exporters" },
+    focus: { zh: "增长与融资成本", en: "Growth & financing cost" },
     base: 50
   },
   {
     id: "banks",
-    name: "银行与金融",
-    focus: "通胀预期与信誉",
+    name: { zh: "银行与金融", en: "Banks & Finance" },
+    focus: { zh: "通胀预期与信誉", en: "Inflation expectations & credibility" },
     base: 48
   },
   {
     id: "opposition",
-    name: "反对派",
-    focus: "社会稳定与民意",
+    name: { zh: "反对派", en: "Opposition" },
+    focus: { zh: "社会稳定与民意", en: "Social stability & approval" },
     base: 42
   }
 ];
@@ -116,20 +128,138 @@ const state = {
 
 const history = [];
 const kpiConfig = [
-  { key: "y", label: "产出缺口 y", unit: "%" },
-  { key: "pi", label: "通胀 π", unit: "%" },
-  { key: "piE", label: "通胀预期 πᵉ", unit: "%" },
-  { key: "i", label: "名义利率 i", unit: "%" },
-  { key: "u", label: "失业率 u", unit: "%" },
-  { key: "A", label: "支持率 A", unit: "%" },
-  { key: "b", label: "债务/GDP b", unit: "%" },
-  { key: "R", label: "外汇储备 R", unit: "月" },
-  { key: "s", label: "风险溢价 s", unit: "%" },
-  { key: "BM", label: "黑市压力 BM", unit: "" }
+  { key: "y", label: { zh: "产出缺口 y", en: "Output gap y" }, unit: "%" },
+  { key: "pi", label: { zh: "通胀 π", en: "Inflation π" }, unit: "%" },
+  { key: "piE", label: { zh: "通胀预期 πᵉ", en: "Inflation expectation πᵉ" }, unit: "%" },
+  { key: "i", label: { zh: "名义利率 i", en: "Nominal rate i" }, unit: "%" },
+  { key: "u", label: { zh: "失业率 u", en: "Unemployment u" }, unit: "%" },
+  { key: "A", label: { zh: "支持率 A", en: "Approval A" }, unit: "%" },
+  { key: "b", label: { zh: "债务/GDP b", en: "Debt/GDP b" }, unit: "%" },
+  { key: "R", label: { zh: "外汇储备 R", en: "FX reserves R" }, unit: { zh: "月", en: "months" } },
+  { key: "s", label: { zh: "风险溢价 s", en: "Risk premium s" }, unit: "%" },
+  { key: "BM", label: { zh: "黑市压力 BM", en: "Black market pressure BM" }, unit: "" }
 ];
 
 const sparklineCharts = new Map();
 let mainChart;
+let currentLang = "zh";
+
+const i18n = {
+  zh: {
+    dashboard: "总览 Dashboard",
+    policies: "政策 Policies",
+    factions: "派系/政治 Factions",
+    principles: "经济原理/公式 Principles",
+    history: "历史与报告 History",
+    reset: "重开新局",
+    tutorial: "新手教程",
+    languageToggle: "English",
+    turn: "季度",
+    status: "政权状态",
+    target: "通胀目标",
+    credibility: "信誉锚定",
+    taylor: "推荐泰勒利率",
+    taylorGap: "偏离泰勒",
+    dashboardDesc: "掌握核心 KPI 的季度变化和风险警报。",
+    chartTitle: "宏观曲线总览",
+    chartDesc: "可多选展示关键变量的路径。",
+    policiesDesc: "设置本季度政策组合，影响下季度经济路径。",
+    policyRate: "政策利率调整 Δi（年化，百分点）",
+    fiscalImpulse: "财政立场 f（需求冲击）",
+    primaryDeficit: "主赤字 d（年化 %GDP）",
+    capitalControls: "资本管制强度（0-1）",
+    bailout: "银行救助/重组（%GDP）",
+    nextQuarter: "推进下一季度",
+    autoRun: "自动模拟 8 季度",
+    factionsDesc: "支持率来自多方权力集团的权衡。",
+    principlesDesc: "模型采用简化的 DSGE/NK 结构，全部为季度动态。",
+    formulasTitle: "核心方程（年化百分比）",
+    winloseTitle: "胜负判定",
+    winloseDesc: "在连续 4 个季度内维持 通胀 ≤ 8%、失业 ≤ 10%、外储 ≥ 4 月 即达成胜利；若通胀 > 60%、外储 < 0.5 月或支持率 < 20% 则失败。",
+    historyDesc: "记录每季度政策与宏观结果。",
+    table: { quarter: "季度", y: "y", pi: "π", pie: "πᵉ", i: "i", u: "u", a: "A", b: "b", r: "R(月)", s: "s", bm: "BM" },
+    infoClose: "关闭",
+    tutorialTitle: "新手教程 · 宏观危机应对",
+    tutorialStart: "开始游戏",
+    tutorialGoal: { label: "目标", text: "在 12 个季度内稳住通胀与就业，同时守住外汇储备与债务。" },
+    tutorialWin: { label: "怎么赢", text: "连续 4 个季度通胀 ≤ 8%、失业 ≤ 10%、外储 ≥ 4 月。" },
+    tutorialLose: { label: "怎么输", text: "通胀 > 60%、外储 < 0.5 月或支持率 < 20%。" },
+    tutorialTip: { label: "建议打法", text: "先用利率和财政缩减锚定预期，逐步恢复增长；偏离泰勒规则会损害信誉。" },
+    tutorialNote: "所有变量均为年化百分比（%）或 GDP 比例；每回合=1季度。",
+    report: {
+      line: (turn, pi, u, A, stance, risk) =>
+        `Q${turn} 报告：通胀 ${pi}%，失业 ${u}%，支持率 ${A}%。${stance}，${risk}`,
+      stanceDown: "经济仍在收缩",
+      stanceUp: "经济开始恢复",
+      riskHigh: "黑市压力偏高，外部约束严峻。",
+      riskOk: "外部压力处于可控范围。"
+    },
+    policyNote: {
+      high: "显著偏离泰勒，信誉惩罚增加。",
+      ok: "偏离泰勒处于可控区间。"
+    },
+    factionsMood: { high: "支持", mid: "观望", low: "不满" },
+    statusLabel: { win: "胜利", fail: "失败", run: "执政中" },
+    chartError: "Chart.js 加载失败，请检查网络。"
+  },
+  en: {
+    dashboard: "Dashboard",
+    policies: "Policies",
+    factions: "Factions",
+    principles: "Principles",
+    history: "History & Report",
+    reset: "Restart",
+    tutorial: "Tutorial",
+    languageToggle: "中文",
+    turn: "Quarter",
+    status: "Status",
+    target: "Inflation target",
+    credibility: "Credibility anchor",
+    taylor: "Taylor rate",
+    taylorGap: "Taylor gap",
+    dashboardDesc: "Track quarterly KPI moves and risk signals.",
+    chartTitle: "Macro overview chart",
+    chartDesc: "Toggle key variables to compare paths.",
+    policiesDesc: "Set this quarter's policy mix and observe next quarter.",
+    policyRate: "Policy rate Δi (annualized, pp)",
+    fiscalImpulse: "Fiscal stance f (demand impulse)",
+    primaryDeficit: "Primary deficit d (%GDP annualized)",
+    capitalControls: "Capital controls (0-1)",
+    bailout: "Bank bailout (%GDP)",
+    nextQuarter: "Advance quarter",
+    autoRun: "Auto-simulate 8 quarters",
+    factionsDesc: "Approval reflects multiple power blocs.",
+    principlesDesc: "Simplified DSGE/NK structure, quarterly dynamics.",
+    formulasTitle: "Core equations (annualized)",
+    winloseTitle: "Win/Lose conditions",
+    winloseDesc: "Win if inflation ≤ 8%, unemployment ≤ 10%, reserves ≥ 4 months for 4 straight quarters. Lose if inflation > 60%, reserves < 0.5 month, or approval < 20%.",
+    historyDesc: "Log each quarter's policy and macro outcomes.",
+    table: { quarter: "Quarter", y: "y", pi: "π", pie: "πᵉ", i: "i", u: "u", a: "A", b: "b", r: "R (months)", s: "s", bm: "BM" },
+    infoClose: "Close",
+    tutorialTitle: "Tutorial · Crisis Response",
+    tutorialStart: "Start game",
+    tutorialGoal: { label: "Goal", text: "Stabilize inflation and jobs within 12 quarters while guarding reserves and debt." },
+    tutorialWin: { label: "Win", text: "Inflation ≤ 8%, unemployment ≤ 10%, reserves ≥ 4 months for 4 quarters." },
+    tutorialLose: { label: "Lose", text: "Inflation > 60%, reserves < 0.5 month, or approval < 20%." },
+    tutorialTip: { label: "Tip", text: "Anchor expectations with rates and fiscal restraint first, then rebuild growth." },
+    tutorialNote: "All values are annualized percentages or GDP ratios; one turn equals one quarter.",
+    report: {
+      line: (turn, pi, u, A, stance, risk) =>
+        `Q${turn} report: inflation ${pi}%, unemployment ${u}%, approval ${A}%. ${stance}, ${risk}`,
+      stanceDown: "The economy is still contracting",
+      stanceUp: "The economy is recovering",
+      riskHigh: "Black market pressure is elevated.",
+      riskOk: "External pressure is manageable."
+    },
+    policyNote: {
+      high: "Large Taylor deviation increases credibility penalties.",
+      ok: "Taylor deviation remains manageable."
+    },
+    factionsMood: { high: "Supportive", mid: "Neutral", low: "Angry" },
+    statusLabel: { win: "Win", fail: "Fail", run: "In office" },
+    chartError: "Chart.js failed to load. Please check your network."
+  }
+};
 
 const getPolicyInputs = () => ({
   deltaI: Number.parseFloat(document.getElementById("policy-rate").value),
@@ -289,7 +419,7 @@ const buildKpis = () => {
     const card = document.createElement("div");
     card.className = "kpi-card";
     card.innerHTML = `
-      <div class="label">${item.label}</div>
+      <div class="label" id="kpi-label-${item.key}">${item.label[currentLang]}</div>
       <div class="value" id="kpi-${item.key}">--</div>
       <canvas id="spark-${item.key}" height="40"></canvas>
     `;
@@ -300,8 +430,21 @@ const buildKpis = () => {
 const updateKpis = () => {
   kpiConfig.forEach((item) => {
     const value = state[item.key];
-    const formatted = item.unit === "月" ? format(value, 2) : format(value, 2) + item.unit;
-    document.getElementById(`kpi-${item.key}`).textContent = formatted;
+    const unit = typeof item.unit === "string" ? item.unit : item.unit[currentLang];
+    const formatted = unit === "月" || unit === "months" ? format(value, 2) : format(value, 2) + unit;
+    const node = document.getElementById(`kpi-${item.key}`);
+    if (node) {
+      node.textContent = formatted;
+    }
+  });
+};
+
+const updateKpiLabels = () => {
+  kpiConfig.forEach((item) => {
+    const label = document.getElementById(`kpi-label-${item.key}`);
+    if (label) {
+      label.textContent = item.label[currentLang];
+    }
   });
 };
 
@@ -314,12 +457,17 @@ const renderFactions = () => {
       0,
       100
     );
-    const mood = score > 65 ? "支持" : score > 45 ? "观望" : "不满";
+    const mood =
+      score > 65
+        ? i18n[currentLang].factionsMood.high
+        : score > 45
+          ? i18n[currentLang].factionsMood.mid
+          : i18n[currentLang].factionsMood.low;
     const card = document.createElement("div");
     card.className = "faction-card";
     card.innerHTML = `
-      <h4>${faction.name}</h4>
-      <p>${faction.focus} · ${mood}（${format(score, 0)}）</p>
+      <h4>${faction.name[currentLang]}</h4>
+      <p>${faction.focus[currentLang]} · ${mood}（${format(score, 0)}）</p>
       <div class="bar"><span style="width: ${score}%"></span></div>
     `;
     list.appendChild(card);
@@ -353,28 +501,36 @@ const updateHistoryTable = () => {
 
 const updateReport = () => {
   const report = document.getElementById("report-summary");
-  const riskText = state.BM > 50 ? "黑市压力偏高，外部约束严峻。" : "外部压力处于可控范围。";
-  const stance = state.y < 0 ? "经济仍在收缩" : "经济开始恢复";
-  report.textContent = `Q${state.turn} 报告：通胀 ${format(state.pi, 1)}%，失业 ${format(
-    state.u,
-    1
-  )}%，支持率 ${format(state.A, 0)}%。${stance}，${riskText}`;
+  const riskText =
+    state.BM > 50 ? i18n[currentLang].report.riskHigh : i18n[currentLang].report.riskOk;
+  const stance = state.y < 0 ? i18n[currentLang].report.stanceDown : i18n[currentLang].report.stanceUp;
+  report.textContent = i18n[currentLang].report.line(
+    state.turn,
+    format(state.pi, 1),
+    format(state.u, 1),
+    format(state.A, 0),
+    stance,
+    riskText
+  );
 };
 
 const updatePolicyReadout = () => {
   const policy = getPolicyInputs();
   const iTaylor = computeTaylor(state.pi, state.y);
   const deviation = state.i + policy.deltaI - iTaylor;
-  const note = deviation > 1 ? "显著偏离泰勒，信誉惩罚增加。" : "偏离泰勒处于可控区间。";
+  const note = deviation > 1 ? i18n[currentLang].policyNote.high : i18n[currentLang].policyNote.ok;
   document.getElementById("policy-readout").innerHTML = `
-    <div>当前 i=${format(state.i, 2)}%，泰勒建议=${format(iTaylor, 2)}%，本季偏离=${format(
-      deviation,
+    <div>${i18n[currentLang].taylor}=${format(iTaylor, 2)}%，i=${format(
+      state.i,
       2
-    )}%</div>
-    <div>预计主赤字 ${format(policy.primaryDeficit, 2)}% GDP，资本管制 ${format(
+    )}%，Δ=${format(deviation, 2)}%</div>
+    <div>${i18n[currentLang].primaryDeficit} ${format(
+      policy.primaryDeficit,
+      2
+    )}% GDP，${i18n[currentLang].capitalControls} ${format(
       policy.controls,
       2
-    )}，救助 ${format(policy.bailout, 2)}% GDP。</div>
+    )}，${i18n[currentLang].bailout} ${format(policy.bailout, 2)}% GDP。</div>
     <div>${note}</div>
   `;
 };
@@ -436,7 +592,7 @@ const createMainChart = () => {
   const ctx = document.getElementById("main-chart").getContext("2d");
   const datasets = kpiConfig.map((item, index) => ({
     key: item.key,
-    label: item.label,
+    label: item.label[currentLang],
     data: [],
     borderColor: `hsl(${(index * 38) % 360} 70% 45%)`,
     backgroundColor: "transparent",
@@ -491,11 +647,11 @@ const checkGameStatus = () => {
   const win =
     state.pi <= 8 && state.u <= 10 && state.R >= 4 && history.length >= 4 &&
     history.slice(-4).every((row) => row.pi <= 8 && row.u <= 10 && row.R >= 4);
-  if (win) return { status: "胜利", message: "稳定目标达成" };
+  if (win) return { status: i18n[currentLang].statusLabel.win, message: "稳定目标达成" };
   if (state.pi > 60 || state.R < 0.5 || state.A < 20) {
-    return { status: "失败", message: "宏观失控" };
+    return { status: i18n[currentLang].statusLabel.fail, message: "宏观失控" };
   }
-  return { status: "执政中", message: "继续改革" };
+  return { status: i18n[currentLang].statusLabel.run, message: "继续改革" };
 };
 
 const applyTurn = () => {
@@ -521,7 +677,9 @@ const updateView = () => {
   updateTopbar();
   updateKpis();
   updateSparklines();
-  updateMainChart();
+  if (mainChart) {
+    updateMainChart();
+  }
   renderFactions();
   updateHistoryTable();
   updateReport();
@@ -564,29 +722,39 @@ const closeModal = (modal) => {
 
 const infoContent = {
   dashboard: {
-    title: "总览说明",
-    content:
-      "总览展示所有关键变量曲线。每张 KPI 卡片附带迷你曲线，反映近期趋势。曲线可通过右侧复选框自由组合。"
+    title: { zh: "总览说明", en: "Dashboard" },
+    content: {
+      zh: "总览展示所有关键变量曲线。每张 KPI 卡片附带迷你曲线，反映近期趋势。曲线可通过右侧复选框自由组合。",
+      en: "The dashboard shows all key series. Each KPI card includes a sparkline to highlight trends."
+    }
   },
   policies: {
-    title: "政策说明",
-    content:
-      "你可以调整利率、财政立场、赤字与资本管制。系统将按照宏观方程计算下一季度。偏离泰勒规则和高赤字会损害信誉。"
+    title: { zh: "政策说明", en: "Policies" },
+    content: {
+      zh: "你可以调整利率、财政立场、赤字与资本管制。系统将按照宏观方程计算下一季度。偏离泰勒规则和高赤字会损害信誉。",
+      en: "Adjust rates, fiscal stance, deficit, and controls. The engine computes next quarter outcomes."
+    }
   },
   factions: {
-    title: "派系说明",
-    content:
-      "不同派系关注就业、融资成本与通胀稳定。支持率是综合结果，但派系满意度过低会加剧政治压力。"
+    title: { zh: "派系说明", en: "Factions" },
+    content: {
+      zh: "不同派系关注就业、融资成本与通胀稳定。支持率是综合结果，但派系满意度过低会加剧政治压力。",
+      en: "Factions care about jobs, financing costs, and inflation stability. Low support increases pressure."
+    }
   },
   principles: {
-    title: "公式说明",
-    content:
-      "模型基于 IS、菲利普斯曲线与信誉锚定机制。每回合是一个季度，利率与通胀使用年化百分比。"
+    title: { zh: "公式说明", en: "Principles" },
+    content: {
+      zh: "模型基于 IS、菲利普斯曲线与信誉锚定机制。每回合是一个季度，利率与通胀使用年化百分比。",
+      en: "The model combines IS, Phillips curve, and credibility anchoring. One turn equals one quarter."
+    }
   },
   history: {
-    title: "历史说明",
-    content:
-      "历史表记录每季度关键变量。报告区会自动生成一句政策总结，便于回顾走势与风险。"
+    title: { zh: "历史说明", en: "History" },
+    content: {
+      zh: "历史表记录每季度关键变量。报告区会自动生成一句政策总结，便于回顾走势与风险。",
+      en: "History logs each quarter's metrics. The report summarizes the situation automatically."
+    }
   }
 };
 
@@ -599,8 +767,8 @@ const initInfoButtons = () => {
     btn.addEventListener("click", () => {
       const info = infoContent[btn.dataset.info];
       if (info) {
-        title.textContent = info.title;
-        content.textContent = info.content;
+        title.textContent = info.title[currentLang];
+        content.textContent = info.content[currentLang];
       }
       openModal(modal);
     });
@@ -626,11 +794,103 @@ const initNavigation = () => {
 };
 
 const initCharts = () => {
-  buildKpis();
   const colors = ["#2563eb", "#ef4444", "#f97316", "#0ea5e9", "#10b981", "#6366f1", "#a855f7", "#eab308", "#14b8a6", "#f43f5e"];
   kpiConfig.forEach((item, index) => createSparkline(item.key, colors[index % colors.length]));
   createMainChart();
 };
+
+const destroyCharts = () => {
+  sparklineCharts.forEach((chart) => chart.destroy());
+  sparklineCharts.clear();
+  if (mainChart) {
+    mainChart.destroy();
+    mainChart = null;
+  }
+};
+
+const applyLanguage = (lang) => {
+  currentLang = lang;
+  const copy = i18n[currentLang];
+  document.querySelector('.nav-btn[data-view="dashboard"]').textContent = copy.dashboard;
+  document.querySelector('.nav-btn[data-view="policies"]').textContent = copy.policies;
+  document.querySelector('.nav-btn[data-view="factions"]').textContent = copy.factions;
+  document.querySelector('.nav-btn[data-view="principles"]').textContent = copy.principles;
+  document.querySelector('.nav-btn[data-view="history"]').textContent = copy.history;
+  document.getElementById("reset-game").textContent = copy.reset;
+  document.getElementById("toggle-tutorial").textContent = copy.tutorial;
+  document.getElementById("toggle-language").textContent = copy.languageToggle;
+  document.getElementById("label-turn").textContent = copy.turn;
+  document.getElementById("label-status").textContent = copy.status;
+  document.getElementById("label-target").textContent = copy.target;
+  document.getElementById("label-credibility").textContent = copy.credibility;
+  document.getElementById("label-taylor").textContent = copy.taylor;
+  document.getElementById("label-gap").textContent = copy.taylorGap;
+  document.getElementById("title-dashboard").textContent = copy.dashboard;
+  document.getElementById("desc-dashboard").textContent = copy.dashboardDesc;
+  document.getElementById("title-main-chart").textContent = copy.chartTitle;
+  document.getElementById("desc-main-chart").textContent = copy.chartDesc;
+  document.getElementById("title-policies").textContent = copy.policies;
+  document.getElementById("desc-policies").textContent = copy.policiesDesc;
+  document.getElementById("label-policy-rate").textContent = copy.policyRate;
+  document.getElementById("label-fiscal-impulse").textContent = copy.fiscalImpulse;
+  document.getElementById("label-primary-deficit").textContent = copy.primaryDeficit;
+  document.getElementById("label-capital-controls").textContent = copy.capitalControls;
+  document.getElementById("label-bailout").textContent = copy.bailout;
+  document.getElementById("next-quarter").textContent = copy.nextQuarter;
+  document.getElementById("auto-run").textContent = copy.autoRun;
+  document.getElementById("title-factions").textContent = copy.factions;
+  document.getElementById("desc-factions").textContent = copy.factionsDesc;
+  document.getElementById("title-principles").textContent = copy.principles;
+  document.getElementById("desc-principles").textContent = copy.principlesDesc;
+  document.getElementById("title-formulas").textContent = copy.formulasTitle;
+  document.getElementById("title-winlose").textContent = copy.winloseTitle;
+  document.getElementById("desc-winlose").textContent = copy.winloseDesc;
+  document.getElementById("title-history").textContent = copy.history;
+  document.getElementById("desc-history").textContent = copy.historyDesc;
+  document.getElementById("col-quarter").textContent = copy.table.quarter;
+  document.getElementById("col-y").textContent = copy.table.y;
+  document.getElementById("col-pi").textContent = copy.table.pi;
+  document.getElementById("col-pie").textContent = copy.table.pie;
+  document.getElementById("col-i").textContent = copy.table.i;
+  document.getElementById("col-u").textContent = copy.table.u;
+  document.getElementById("col-a").textContent = copy.table.a;
+  document.getElementById("col-b").textContent = copy.table.b;
+  document.getElementById("col-r").textContent = copy.table.r;
+  document.getElementById("col-s").textContent = copy.table.s;
+  document.getElementById("col-bm").textContent = copy.table.bm;
+  document.getElementById("close-info").textContent = copy.infoClose;
+  document.getElementById("tutorial-title").textContent = copy.tutorialTitle;
+  document.getElementById("close-tutorial").textContent = copy.tutorialStart;
+  document.getElementById("tutorial-goal").innerHTML = `<strong>${copy.tutorialGoal.label}：</strong>${copy.tutorialGoal.text}`;
+  document.getElementById("tutorial-win").innerHTML = `<strong>${copy.tutorialWin.label}：</strong>${copy.tutorialWin.text}`;
+  document.getElementById("tutorial-lose").innerHTML = `<strong>${copy.tutorialLose.label}：</strong>${copy.tutorialLose.text}`;
+  document.getElementById("tutorial-tip").innerHTML = `<strong>${copy.tutorialTip.label}：</strong>${copy.tutorialTip.text}`;
+  document.getElementById("tutorial-note").textContent = copy.tutorialNote;
+  initScenario();
+  updateKpiLabels();
+  if (window.Chart) {
+    destroyCharts();
+    initCharts();
+  }
+  updateView();
+};
+
+const waitForChart = (timeout = 2000) =>
+  new Promise((resolve, reject) => {
+    const start = Date.now();
+    const check = () => {
+      if (window.Chart) {
+        resolve();
+        return;
+      }
+      if (Date.now() - start > timeout) {
+        reject(new Error("Chart.js not loaded"));
+        return;
+      }
+      requestAnimationFrame(check);
+    };
+    check();
+  });
 
 const bindPolicyInputs = () => {
   document.querySelectorAll(".slider-card input").forEach((input) => {
@@ -645,7 +905,7 @@ const startSimulation = (steps) => {
   let count = 0;
   const run = () => {
     if (count >= steps) return;
-    if (checkGameStatus().status !== "执政中") return;
+    if (checkGameStatus().status !== i18n[currentLang].statusLabel.run) return;
     applyTurn();
     updateView();
     count += 1;
@@ -666,29 +926,40 @@ const resetGame = () => {
 
 const initScenario = () => {
   const scenario = scenarios[0];
-  document.getElementById("scenario-title").textContent = scenario.title;
-  document.getElementById("scenario-desc").textContent = scenario.description;
+  document.getElementById("scenario-title").textContent = scenario.title[currentLang];
+  document.getElementById("scenario-desc").textContent = scenario.description[currentLang];
 };
 
-const init = () => {
+const init = async () => {
   initScenario();
-  initCharts();
+  buildKpis();
   initHistory();
   updateSliderLabels();
-  updateView();
   initNavigation();
   initInfoButtons();
   initTutorial();
   bindPolicyInputs();
 
+  try {
+    await waitForChart();
+    initCharts();
+  } catch (error) {
+    document.getElementById("policy-readout").textContent = i18n[currentLang].chartError;
+  }
+
+  applyLanguage(currentLang);
+
   document.getElementById("next-quarter").addEventListener("click", () => {
-    if (checkGameStatus().status !== "执政中") return;
+    if (checkGameStatus().status !== i18n[currentLang].statusLabel.run) return;
     applyTurn();
     updateView();
   });
 
   document.getElementById("auto-run").addEventListener("click", () => startSimulation(8));
   document.getElementById("reset-game").addEventListener("click", resetGame);
+  document.getElementById("toggle-language").addEventListener("click", () => {
+    applyLanguage(currentLang === "zh" ? "en" : "zh");
+  });
 };
 
 init();

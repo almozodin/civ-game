@@ -24,21 +24,22 @@
         </nav>
         <div class="status">
           <div>
-            <span class="label">季度</span>
+            <span class="label" id="label-turn">季度</span>
             <strong id="turn-label">Q1</strong>
           </div>
           <div>
-            <span class="label">政权状态</span>
+            <span class="label" id="label-status">政权状态</span>
             <strong id="game-status">执政中</strong>
           </div>
           <div>
-            <span class="label">通胀目标</span>
+            <span class="label" id="label-target">通胀目标</span>
             <strong id="target-label">4%</strong>
           </div>
         </div>
         <div class="side-actions">
           <button class="btn ghost" id="reset-game">重开新局</button>
           <button class="btn ghost" id="toggle-tutorial">新手教程</button>
+          <button class="btn ghost" id="toggle-language">English</button>
         </div>
       </aside>
 
@@ -50,15 +51,15 @@
           </div>
           <div class="topbar-meta">
             <div>
-              <span class="label">信誉锚定</span>
+              <span class="label" id="label-credibility">信誉锚定</span>
               <strong id="credibility-label">60</strong>
             </div>
             <div>
-              <span class="label">推荐泰勒利率</span>
+              <span class="label" id="label-taylor">推荐泰勒利率</span>
               <strong id="taylor-label">--</strong>
             </div>
             <div>
-              <span class="label">偏离泰勒</span>
+              <span class="label" id="label-gap">偏离泰勒</span>
               <strong id="taylor-gap">--</strong>
             </div>
           </div>
@@ -67,8 +68,8 @@
         <section class="view active" id="view-dashboard">
           <div class="section-header">
             <div>
-              <h3>总览 Dashboard</h3>
-              <p>掌握核心 KPI 的季度变化和风险警报。</p>
+            <h3 id="title-dashboard">总览 Dashboard</h3>
+              <p id="desc-dashboard">掌握核心 KPI 的季度变化和风险警报。</p>
             </div>
             <button class="btn info" data-info="dashboard">ⓘ 说明</button>
           </div>
@@ -77,8 +78,8 @@
           <div class="panel chart-panel">
             <div class="panel-header">
               <div>
-                <h4>宏观曲线总览</h4>
-                <p>可多选展示关键变量的路径。</p>
+                <h4 id="title-main-chart">宏观曲线总览</h4>
+                <p id="desc-main-chart">可多选展示关键变量的路径。</p>
               </div>
               <div class="legend" id="chart-legend"></div>
             </div>
@@ -89,35 +90,35 @@
         <section class="view" id="view-policies">
           <div class="section-header">
             <div>
-              <h3>政策 Policies</h3>
-              <p>设置本季度政策组合，影响下季度经济路径。</p>
+            <h3 id="title-policies">政策 Policies</h3>
+              <p id="desc-policies">设置本季度政策组合，影响下季度经济路径。</p>
             </div>
             <button class="btn info" data-info="policies">ⓘ 说明</button>
           </div>
           <div class="panel policy-panel">
             <div class="policy-grid">
               <label class="slider-card">
-                <span>政策利率调整 Δi（年化，百分点）</span>
+                <span id="label-policy-rate">政策利率调整 Δi（年化，百分点）</span>
                 <input type="range" id="policy-rate" min="-3" max="3" step="0.25" value="0" />
                 <strong id="policy-rate-value">0.00</strong>
               </label>
               <label class="slider-card">
-                <span>财政立场 f（需求冲击）</span>
+                <span id="label-fiscal-impulse">财政立场 f（需求冲击）</span>
                 <input type="range" id="fiscal-impulse" min="-3" max="3" step="0.25" value="0" />
                 <strong id="fiscal-impulse-value">0.00</strong>
               </label>
               <label class="slider-card">
-                <span>主赤字 d（年化 %GDP）</span>
+                <span id="label-primary-deficit">主赤字 d（年化 %GDP）</span>
                 <input type="range" id="primary-deficit" min="-2" max="10" step="0.25" value="3" />
                 <strong id="primary-deficit-value">3.00</strong>
               </label>
               <label class="slider-card">
-                <span>资本管制强度（0-1）</span>
+                <span id="label-capital-controls">资本管制强度（0-1）</span>
                 <input type="range" id="capital-controls" min="0" max="1" step="0.05" value="0.2" />
                 <strong id="capital-controls-value">0.20</strong>
               </label>
               <label class="slider-card">
-                <span>银行救助/重组（%GDP）</span>
+                <span id="label-bailout">银行救助/重组（%GDP）</span>
                 <input type="range" id="bailout" min="0" max="4" step="0.25" value="0" />
                 <strong id="bailout-value">0.00</strong>
               </label>
@@ -133,8 +134,8 @@
         <section class="view" id="view-factions">
           <div class="section-header">
             <div>
-              <h3>派系/政治 Factions</h3>
-              <p>支持率来自多方权力集团的权衡。</p>
+            <h3 id="title-factions">派系/政治 Factions</h3>
+              <p id="desc-factions">支持率来自多方权力集团的权衡。</p>
             </div>
             <button class="btn info" data-info="factions">ⓘ 说明</button>
           </div>
@@ -144,13 +145,13 @@
         <section class="view" id="view-principles">
           <div class="section-header">
             <div>
-              <h3>经济原理/公式 Principles</h3>
-              <p>模型采用简化的 DSGE/NK 结构，全部为季度动态。</p>
+            <h3 id="title-principles">经济原理/公式 Principles</h3>
+              <p id="desc-principles">模型采用简化的 DSGE/NK 结构，全部为季度动态。</p>
             </div>
             <button class="btn info" data-info="principles">ⓘ 说明</button>
           </div>
           <div class="panel principles">
-            <h4>核心方程（年化百分比）</h4>
+            <h4 id="title-formulas">核心方程（年化百分比）</h4>
             <ul>
               <li>IS/需求：yₜ₊₁ = ρᵧ yₜ - φᵣ[(iₜ-πᵉₜ)-r*] + φᶠ fₜ + εᴰ</li>
               <li>NKPC：πₜ₊₁ = β πᵉₜ + κ yₜ + εˢ</li>
@@ -163,16 +164,16 @@
               <li>黑市压力：BM = clip(0.6·deprec + 10·controlsSideEffect + 0.4·ReLU(πₜ-30), 0, 100)</li>
               <li>外储更新：CA = baseCA + 0.04·(-yₜ) + 0.02·deprec；Rₜ₊₁ = clip(Rₜ + 0.5·CA - 0.25·Outflow, 0, 12)</li>
             </ul>
-            <h4>胜负判定</h4>
-            <p>在连续 4 个季度内维持 <strong>通胀 ≤ 8%</strong>、<strong>失业 ≤ 10%</strong>、<strong>外储 ≥ 4 月</strong> 即达成胜利；若通胀 > 60%、外储 < 0.5 月或支持率 < 20% 则失败。</p>
+            <h4 id="title-winlose">胜负判定</h4>
+            <p id="desc-winlose">在连续 4 个季度内维持 <strong>通胀 ≤ 8%</strong>、<strong>失业 ≤ 10%</strong>、<strong>外储 ≥ 4 月</strong> 即达成胜利；若通胀 > 60%、外储 < 0.5 月或支持率 < 20% 则失败。</p>
           </div>
         </section>
 
         <section class="view" id="view-history">
           <div class="section-header">
             <div>
-              <h3>历史与报告 History</h3>
-              <p>记录每季度政策与宏观结果。</p>
+            <h3 id="title-history">历史与报告 History</h3>
+              <p id="desc-history">记录每季度政策与宏观结果。</p>
             </div>
             <button class="btn info" data-info="history">ⓘ 说明</button>
           </div>
@@ -181,17 +182,17 @@
             <table class="history-table">
               <thead>
                 <tr>
-                  <th>季度</th>
-                  <th>y</th>
-                  <th>π</th>
-                  <th>πᵉ</th>
-                  <th>i</th>
-                  <th>u</th>
-                  <th>A</th>
-                  <th>b</th>
-                  <th>R(月)</th>
-                  <th>s</th>
-                  <th>BM</th>
+                  <th id="col-quarter">季度</th>
+                  <th id="col-y">y</th>
+                  <th id="col-pi">π</th>
+                  <th id="col-pie">πᵉ</th>
+                  <th id="col-i">i</th>
+                  <th id="col-u">u</th>
+                  <th id="col-a">A</th>
+                  <th id="col-b">b</th>
+                  <th id="col-r">R(月)</th>
+                  <th id="col-s">s</th>
+                  <th id="col-bm">BM</th>
                 </tr>
               </thead>
               <tbody id="history-body"></tbody>
@@ -214,17 +215,17 @@
     <div class="modal" id="tutorial-modal" aria-hidden="true">
       <div class="modal-card">
         <div class="modal-header">
-          <h4>新手教程 · 宏观危机应对</h4>
+          <h4 id="tutorial-title">新手教程 · 宏观危机应对</h4>
           <button class="btn ghost" id="close-tutorial">开始游戏</button>
         </div>
         <div class="modal-body">
-          <p><strong>目标：</strong>在 12 个季度内稳住通胀与就业，同时守住外汇储备与债务。</p>
+          <p id="tutorial-goal"><strong>目标：</strong>在 12 个季度内稳住通胀与就业，同时守住外汇储备与债务。</p>
           <ul>
-            <li><strong>怎么赢：</strong>连续 4 个季度通胀 ≤ 8%、失业 ≤ 10%、外储 ≥ 4 月。</li>
-            <li><strong>怎么输：</strong>通胀 > 60%、外储 < 0.5 月或支持率 < 20%。</li>
-            <li><strong>建议打法：</strong>先用利率和财政缩减锚定预期，逐步恢复增长；偏离泰勒规则会损害信誉。</li>
+            <li id="tutorial-win"><strong>怎么赢：</strong>连续 4 个季度通胀 ≤ 8%、失业 ≤ 10%、外储 ≥ 4 月。</li>
+            <li id="tutorial-lose"><strong>怎么输：</strong>通胀 > 60%、外储 < 0.5 月或支持率 < 20%。</li>
+            <li id="tutorial-tip"><strong>建议打法：</strong>先用利率和财政缩减锚定预期，逐步恢复增长；偏离泰勒规则会损害信誉。</li>
           </ul>
-          <p>所有变量均为年化百分比（%）或 GDP 比例；每回合=1季度。</p>
+          <p id="tutorial-note">所有变量均为年化百分比（%）或 GDP 比例；每回合=1季度。</p>
         </div>
       </div>
     </div>
