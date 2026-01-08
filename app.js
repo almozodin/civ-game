@@ -419,7 +419,7 @@ const buildKpis = () => {
     const card = document.createElement("div");
     card.className = "kpi-card";
     card.innerHTML = `
-      <div class="label">${item.label[currentLang]}</div>
+      <div class="label" id="kpi-label-${item.key}">${item.label[currentLang]}</div>
       <div class="value" id="kpi-${item.key}">--</div>
       <canvas id="spark-${item.key}" height="40"></canvas>
     `;
@@ -432,7 +432,19 @@ const updateKpis = () => {
     const value = state[item.key];
     const unit = typeof item.unit === "string" ? item.unit : item.unit[currentLang];
     const formatted = unit === "月" || unit === "months" ? format(value, 2) : format(value, 2) + unit;
-    document.getElementById(`kpi-${item.key}`).textContent = formatted;
+    const node = document.getElementById(`kpi-${item.key}`);
+    if (node) {
+      node.textContent = formatted;
+    }
+  });
+};
+
+const updateKpiLabels = () => {
+  kpiConfig.forEach((item) => {
+    const label = document.getElementById(`kpi-label-${item.key}`);
+    if (label) {
+      label.textContent = item.label[currentLang];
+    }
   });
 };
 
@@ -782,7 +794,6 @@ const initNavigation = () => {
 };
 
 const initCharts = () => {
-  buildKpis();
   const colors = ["#2563eb", "#ef4444", "#f97316", "#0ea5e9", "#10b981", "#6366f1", "#a855f7", "#eab308", "#14b8a6", "#f43f5e"];
   kpiConfig.forEach((item, index) => createSparkline(item.key, colors[index % colors.length]));
   createMainChart();
@@ -856,6 +867,7 @@ const applyLanguage = (lang) => {
   document.getElementById("tutorial-tip").innerHTML = `<strong>${copy.tutorialTip.label}：</strong>${copy.tutorialTip.text}`;
   document.getElementById("tutorial-note").textContent = copy.tutorialNote;
   initScenario();
+  updateKpiLabels();
   if (window.Chart) {
     destroyCharts();
     initCharts();
@@ -920,6 +932,7 @@ const initScenario = () => {
 
 const init = async () => {
   initScenario();
+  buildKpis();
   initHistory();
   updateSliderLabels();
   initNavigation();
