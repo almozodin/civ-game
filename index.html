@@ -3,1147 +3,231 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>经济危机解决模拟器 - MVP</title>
-    <style>
-      :root {
-        color-scheme: light;
-        --bg: #f5f7fb;
-        --panel: #ffffff;
-        --ink: #1f2a44;
-        --muted: #5a6686;
-        --accent: #2f6fed;
-        --warn: #d1495b;
-        --good: #2a9d8f;
-        --shadow: 0 12px 30px rgba(31, 42, 68, 0.12);
-        --border: #e2e6f2;
-      }
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-        background: var(--bg);
-        color: var(--ink);
-      }
-      header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 20px 28px;
-        background: var(--panel);
-        box-shadow: var(--shadow);
-        position: sticky;
-        top: 0;
-        z-index: 10;
-      }
-      header h1 {
-        margin: 0;
-        font-size: 20px;
-      }
-      header .meta {
-        display: flex;
-        gap: 16px;
-        color: var(--muted);
-        font-size: 14px;
-      }
-      main {
-        display: grid;
-        grid-template-columns: minmax(280px, 1.1fr) minmax(280px, 0.9fr);
-        gap: 20px;
-        padding: 24px 28px 140px;
-      }
-      section {
-        background: var(--panel);
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: var(--shadow);
-        border: 1px solid var(--border);
-      }
-      .panel-title {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 12px;
-      }
-      .panel-title h2 {
-        font-size: 16px;
-        margin: 0;
-      }
-      .indicator-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 12px;
-      }
-      .indicator {
-        padding: 12px;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: #fafbff;
-      }
-      .indicator .label {
-        font-size: 13px;
-        color: var(--muted);
-      }
-      .indicator .value {
-        font-size: 22px;
-        font-weight: 600;
-        margin-top: 4px;
-      }
-      .indicator .delta {
-        font-size: 12px;
-        margin-top: 4px;
-      }
-      .delta.up {
-        color: var(--warn);
-      }
-      .delta.down {
-        color: var(--good);
-      }
-      .delta.flat {
-        color: var(--muted);
-      }
-      .faction {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        padding: 10px 12px;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: #fafbff;
-      }
-      .faction-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        font-size: 14px;
-      }
-      .faction-bar {
-        width: 100%;
-        height: 8px;
-        background: #e6e9f4;
-        border-radius: 999px;
-        overflow: hidden;
-      }
-      .faction-bar span {
-        display: block;
-        height: 100%;
-        background: linear-gradient(90deg, #2f6fed, #2a9d8f);
-      }
-      .log {
-        max-height: 420px;
-        overflow: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-      .log-entry {
-        border-left: 4px solid var(--accent);
-        padding: 8px 12px;
-        background: #f9faff;
-        border-radius: 8px;
-        font-size: 13px;
-      }
-      .log-entry .headline {
-        font-weight: 600;
-      }
-      .controls {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: var(--panel);
-        box-shadow: 0 -8px 24px rgba(31, 42, 68, 0.1);
-        padding: 16px 28px;
-        display: grid;
-        grid-template-columns: 1.6fr 1fr;
-        gap: 16px;
-      }
-      .policy-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 12px;
-      }
-      button {
-        border: none;
-        border-radius: 12px;
-        padding: 10px 12px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: transform 0.1s ease, box-shadow 0.1s ease;
-      }
-      button:disabled {
-        cursor: not-allowed;
-        opacity: 0.5;
-      }
-      button:hover:not(:disabled) {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(47, 111, 237, 0.2);
-      }
-      .btn-primary {
-        background: var(--accent);
-        color: #fff;
-      }
-      .btn-secondary {
-        background: #e9eefc;
-        color: var(--accent);
-      }
-      .btn-ghost {
-        background: #f3f5fb;
-        color: var(--muted);
-      }
-      .policy-card {
-        border: 1px solid var(--border);
-        background: #fbfcff;
-        padding: 10px;
-        border-radius: 12px;
-      }
-      .policy-card h3 {
-        margin: 0 0 6px;
-        font-size: 14px;
-      }
-      .policy-card p {
-        margin: 0 0 6px;
-        font-size: 12px;
-        color: var(--muted);
-      }
-      .policy-card .meta {
-        font-size: 11px;
-        color: var(--muted);
-      }
-      .actions {
-        display: grid;
-        gap: 8px;
-      }
-      .inline-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-      .scenario-select {
-        border: 1px solid var(--border);
-        padding: 8px 10px;
-        border-radius: 8px;
-        font-size: 14px;
-      }
-      .tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 10px;
-        border-radius: 999px;
-        background: #eaf0ff;
-        font-size: 12px;
-        color: var(--accent);
-      }
-      .hidden {
-        display: none;
-      }
-      @media (max-width: 960px) {
-        main {
-          grid-template-columns: 1fr;
-          padding-bottom: 220px;
-        }
-        .controls {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
+    <title>危机模拟器·宏观引擎 MVP2</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+    <script src="app.js" defer></script>
   </head>
   <body>
-    <header>
-      <div>
-        <h1>经济危机解决模拟器 · MVP</h1>
-        <div class="meta">
-          <span id="round">回合 1</span>
-          <span id="scenario-name">剧本：默认</span>
-          <span class="tag" id="status-tag">执政中</span>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <h1>危机模拟器</h1>
+          <p>宏观引擎 MVP2 · 季度制</p>
         </div>
-      </div>
-      <div class="meta">
-        <span>schemaVersion: <strong id="schema-version">1</strong></span>
-      </div>
-    </header>
-
-    <main>
-      <section>
-        <div class="panel-title">
-          <h2>经济指标</h2>
-          <div class="meta" id="policy-limit">本回合已选 0/3</div>
-        </div>
-        <div class="indicator-grid" id="indicator-grid"></div>
-      </section>
-
-      <section>
-        <div class="panel-title">
-          <h2>派系满意度</h2>
-          <div class="meta" id="faction-summary">保持平衡</div>
-        </div>
-        <div id="faction-list" class="faction-list"></div>
-      </section>
-
-      <section>
-        <div class="panel-title">
-          <h2>事件日志</h2>
-          <div class="meta">内阁简报 / 新闻</div>
-        </div>
-        <div id="log" class="log"></div>
-      </section>
-
-      <section>
-        <div class="panel-title">
-          <h2>系统操作</h2>
-          <div class="meta">存档/读档</div>
-        </div>
-        <div class="actions">
-          <label>
-            剧本选择
-            <select id="scenario-select" class="scenario-select"></select>
-          </label>
-          <div class="inline-actions">
-            <button class="btn-secondary" id="save-btn">导出存档 JSON</button>
-            <button class="btn-secondary" id="load-btn">导入存档 JSON</button>
-            <button class="btn-ghost" id="reset-btn">重开本局</button>
+        <nav class="nav">
+          <button class="nav-btn active" data-view="dashboard">总览 Dashboard</button>
+          <button class="nav-btn" data-view="policies">政策 Policies</button>
+          <button class="nav-btn" data-view="factions">派系/政治 Factions</button>
+          <button class="nav-btn" data-view="principles">经济原理/公式 Principles</button>
+          <button class="nav-btn" data-view="history">历史与报告 History</button>
+        </nav>
+        <div class="status">
+          <div>
+            <span class="label" id="label-turn">季度</span>
+            <strong id="turn-label">Q1</strong>
           </div>
-          <textarea id="save-area" rows="6" placeholder="存档 JSON 将显示在这里，也可粘贴导入" style="width: 100%; border-radius: 10px; border: 1px solid var(--border); padding: 8px;"></textarea>
+          <div>
+            <span class="label" id="label-status">政权状态</span>
+            <strong id="game-status">执政中</strong>
+          </div>
+          <div>
+            <span class="label" id="label-target">通胀目标</span>
+            <strong id="target-label">4%</strong>
+          </div>
         </div>
-      </section>
-    </main>
+        <div class="side-actions">
+          <button class="btn ghost" id="reset-game">重开新局</button>
+          <button class="btn ghost" id="toggle-tutorial">新手教程</button>
+          <button class="btn ghost" id="toggle-language">English</button>
+        </div>
+      </aside>
 
-    <div class="controls">
-      <div>
-        <div class="panel-title">
-          <h2>政策选择</h2>
-          <div class="meta">选择 1-3 项，然后结束回合</div>
+      <main class="content">
+        <header class="topbar">
+          <div>
+            <h2 id="scenario-title">默认危机：软着陆试验</h2>
+            <p id="scenario-desc">在三年内稳定通胀并维持外储。</p>
+          </div>
+          <div class="topbar-meta">
+            <div>
+              <span class="label" id="label-credibility">信誉锚定</span>
+              <strong id="credibility-label">60</strong>
+            </div>
+            <div>
+              <span class="label" id="label-taylor">推荐泰勒利率</span>
+              <strong id="taylor-label">--</strong>
+            </div>
+            <div>
+              <span class="label" id="label-gap">偏离泰勒</span>
+              <strong id="taylor-gap">--</strong>
+            </div>
+          </div>
+        </header>
+
+        <section class="view active" id="view-dashboard">
+          <div class="section-header">
+            <div>
+            <h3 id="title-dashboard">总览 Dashboard</h3>
+              <p id="desc-dashboard">掌握核心 KPI 的季度变化和风险警报。</p>
+            </div>
+            <button class="btn info" data-info="dashboard">ⓘ 说明</button>
+          </div>
+          <div class="kpi-grid" id="kpi-grid"></div>
+
+          <div class="panel chart-panel">
+            <div class="panel-header">
+              <div>
+                <h4 id="title-main-chart">宏观曲线总览</h4>
+                <p id="desc-main-chart">可多选展示关键变量的路径。</p>
+              </div>
+              <div class="legend" id="chart-legend"></div>
+            </div>
+            <canvas id="main-chart" height="140"></canvas>
+          </div>
+        </section>
+
+        <section class="view" id="view-policies">
+          <div class="section-header">
+            <div>
+            <h3 id="title-policies">政策 Policies</h3>
+              <p id="desc-policies">设置本季度政策组合，影响下季度经济路径。</p>
+            </div>
+            <button class="btn info" data-info="policies">ⓘ 说明</button>
+          </div>
+          <div class="panel policy-panel">
+            <div class="policy-grid">
+              <label class="slider-card">
+                <span id="label-policy-rate">政策利率调整 Δi（年化，百分点）</span>
+                <input type="range" id="policy-rate" min="-3" max="3" step="0.25" value="0" />
+                <strong id="policy-rate-value">0.00</strong>
+              </label>
+              <label class="slider-card">
+                <span id="label-fiscal-impulse">财政立场 f（需求冲击）</span>
+                <input type="range" id="fiscal-impulse" min="-3" max="3" step="0.25" value="0" />
+                <strong id="fiscal-impulse-value">0.00</strong>
+              </label>
+              <label class="slider-card">
+                <span id="label-primary-deficit">主赤字 d（年化 %GDP）</span>
+                <input type="range" id="primary-deficit" min="-2" max="10" step="0.25" value="3" />
+                <strong id="primary-deficit-value">3.00</strong>
+              </label>
+              <label class="slider-card">
+                <span id="label-capital-controls">资本管制强度（0-1）</span>
+                <input type="range" id="capital-controls" min="0" max="1" step="0.05" value="0.2" />
+                <strong id="capital-controls-value">0.20</strong>
+              </label>
+              <label class="slider-card">
+                <span id="label-bailout">银行救助/重组（%GDP）</span>
+                <input type="range" id="bailout" min="0" max="4" step="0.25" value="0" />
+                <strong id="bailout-value">0.00</strong>
+              </label>
+            </div>
+            <div class="policy-actions">
+              <button class="btn primary" id="next-quarter">推进下一季度</button>
+              <button class="btn ghost" id="auto-run">自动模拟 8 季度</button>
+            </div>
+            <div class="policy-readout" id="policy-readout"></div>
+          </div>
+        </section>
+
+        <section class="view" id="view-factions">
+          <div class="section-header">
+            <div>
+            <h3 id="title-factions">派系/政治 Factions</h3>
+              <p id="desc-factions">支持率来自多方权力集团的权衡。</p>
+            </div>
+            <button class="btn info" data-info="factions">ⓘ 说明</button>
+          </div>
+          <div class="panel faction-panel" id="faction-list"></div>
+        </section>
+
+        <section class="view" id="view-principles">
+          <div class="section-header">
+            <div>
+            <h3 id="title-principles">经济原理/公式 Principles</h3>
+              <p id="desc-principles">模型采用简化的 DSGE/NK 结构，全部为季度动态。</p>
+            </div>
+            <button class="btn info" data-info="principles">ⓘ 说明</button>
+          </div>
+          <div class="panel principles">
+            <h4 id="title-formulas">核心方程（年化百分比）</h4>
+            <ul>
+              <li>IS/需求：yₜ₊₁ = ρᵧ yₜ - φᵣ[(iₜ-πᵉₜ)-r*] + φᶠ fₜ + εᴰ</li>
+              <li>NKPC：πₜ₊₁ = β πᵉₜ + κ yₜ + εˢ</li>
+              <li>预期锚定：πᵉₜ₊₁ = (1-λ(c))πᵉₜ + λ(c)π* + χ(1-c)(πₜ-π*)</li>
+              <li>信誉更新：cₜ₊₁ = clip(cₜ + a₁·Consistency - a₂|π-π*| - a₃·Monetize + a₄·Success)</li>
+              <li>泰勒规则：iᵀ = rₙ + πₜ + φπ(πₜ-π*) + φᵧ yₜ</li>
+              <li>债务动态：bₜ₊₁ = bₜ + q·( dₜ + ((iₜ + sₜ - gₜ)/100)·bₜ ) + bailoutₜ</li>
+              <li>风险溢价：sₜ = s₀ + γᵇ·ReLU(bₜ-b̄) + γᶜ(1-cₜ)·10 + γᴿ·ReLU(R̄-Rₜ)·8</li>
+              <li>汇率压力：deprec = ψπ(πₜ-π*) - ψʳ·realRate + ψˢ sₜ + εᶠˣ</li>
+              <li>黑市压力：BM = clip(0.6·deprec + 10·controlsSideEffect + 0.4·ReLU(πₜ-30), 0, 100)</li>
+              <li>外储更新：CA = baseCA + 0.04·(-yₜ) + 0.02·deprec；Rₜ₊₁ = clip(Rₜ + 0.5·CA - 0.25·Outflow, 0, 12)</li>
+            </ul>
+            <h4 id="title-winlose">胜负判定</h4>
+            <p id="desc-winlose">在连续 4 个季度内维持 <strong>通胀 ≤ 8%</strong>、<strong>失业 ≤ 10%</strong>、<strong>外储 ≥ 4 月</strong> 即达成胜利；若通胀 > 60%、外储 < 0.5 月或支持率 < 20% 则失败。</p>
+          </div>
+        </section>
+
+        <section class="view" id="view-history">
+          <div class="section-header">
+            <div>
+            <h3 id="title-history">历史与报告 History</h3>
+              <p id="desc-history">记录每季度政策与宏观结果。</p>
+            </div>
+            <button class="btn info" data-info="history">ⓘ 说明</button>
+          </div>
+          <div class="panel report-panel">
+            <div id="report-summary" class="report-summary"></div>
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th id="col-quarter">季度</th>
+                  <th id="col-y">y</th>
+                  <th id="col-pi">π</th>
+                  <th id="col-pie">πᵉ</th>
+                  <th id="col-i">i</th>
+                  <th id="col-u">u</th>
+                  <th id="col-a">A</th>
+                  <th id="col-b">b</th>
+                  <th id="col-r">R(月)</th>
+                  <th id="col-s">s</th>
+                  <th id="col-bm">BM</th>
+                </tr>
+              </thead>
+              <tbody id="history-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal" id="info-modal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h4 id="info-title">说明</h4>
+          <button class="btn ghost" id="close-info">关闭</button>
         </div>
-        <div class="policy-grid" id="policy-grid"></div>
-      </div>
-      <div>
-        <div class="panel-title">
-          <h2>回合操作</h2>
-          <div class="meta" id="action-hint">准备决策</div>
-        </div>
-        <div class="actions">
-          <button class="btn-primary" id="end-turn">结束回合</button>
-          <button class="btn-secondary" id="auto-sim">自动模拟 10 回合</button>
-          <button class="btn-ghost" id="clear-log">清空日志</button>
-        </div>
-        <div class="meta" style="margin-top: 12px; font-size: 12px;">
-          每回合流程：应用政策 → 经济变化（预期/滞后）→ 事件 → 派系 → 胜负判断 → 日志
-        </div>
+        <div id="info-content"></div>
       </div>
     </div>
 
-    <script type="module">
-      const SCHEMA_VERSION = 1;
-      const MAX_POLICIES_PER_TURN = 3;
-      const STABLE_REQUIRED_TURNS = 3;
-
-      const indicatorConfig = [
-        { key: "gdp", label: "GDP 指数", suffix: "" },
-        { key: "inflation", label: "通胀", suffix: "%" },
-        { key: "unemployment", label: "失业", suffix: "%" },
-        { key: "approval", label: "支持率", suffix: "%" },
-        { key: "policyRate", label: "政策利率", suffix: "%" },
-        { key: "moneySupply", label: "货币供应", suffix: "" },
-        { key: "inflationExpectation", label: "通胀预期", suffix: "%" },
-        { key: "credibility", label: "信誉", suffix: "%" },
-        { key: "reserves", label: "外汇储备", suffix: "" },
-        { key: "debt", label: "债务负担", suffix: "%" },
-        { key: "fiscalDeficit", label: "财政赤字", suffix: "%" },
-        { key: "blackMarketFX", label: "黑市汇率压力", suffix: "%" },
-        { key: "bankHealth", label: "银行健康", suffix: "%" }
-      ];
-
-      const scenarios = [
-        {
-          id: "default",
-          name: "默认危机",
-          description: "温和的危机开局，适合新手",
-          initial: {
-            gdp: 100,
-            inflation: 18,
-            unemployment: 9,
-            approval: 55,
-            policyRate: 6,
-            moneySupply: 110,
-            inflationExpectation: 15,
-            credibility: 55,
-            reserves: 60,
-            debt: 55,
-            fiscalDeficit: 5,
-            blackMarketFX: 10,
-            bankHealth: 70
-          }
-        },
-        {
-          id: "argentina",
-          name: "高通胀困局",
-          description: "通胀预期失控，信誉脆弱",
-          initial: {
-            gdp: 92,
-            inflation: 38,
-            unemployment: 13,
-            approval: 45,
-            policyRate: 18,
-            moneySupply: 145,
-            inflationExpectation: 32,
-            credibility: 30,
-            reserves: 35,
-            debt: 70,
-            fiscalDeficit: 7,
-            blackMarketFX: 35,
-            bankHealth: 58
-          }
-        },
-        {
-          id: "bailout",
-          name: "外部冲击",
-          description: "增长放缓、债务高企，外部冲击频发",
-          initial: {
-            gdp: 95,
-            inflation: 12,
-            unemployment: 11,
-            approval: 50,
-            policyRate: 9,
-            moneySupply: 120,
-            inflationExpectation: 13,
-            credibility: 45,
-            reserves: 45,
-            debt: 78,
-            fiscalDeficit: 6,
-            blackMarketFX: 18,
-            bankHealth: 62
-          }
-        }
-      ];
-
-      const factions = [
-        {
-          id: "public",
-          name: "民众与工会",
-          satisfaction: 55,
-          weights: { inflation: -0.4, unemployment: -0.6, gdp: 0.2, approval: 0.5 }
-        },
-        {
-          id: "business",
-          name: "企业",
-          satisfaction: 55,
-          weights: { gdp: 0.5, policyRate: -0.4, credibility: 0.2, inflation: -0.2 }
-        },
-        {
-          id: "banks",
-          name: "银行与金融",
-          satisfaction: 55,
-          weights: { inflation: -0.4, bankHealth: 0.5, credibility: 0.4, policyRate: 0.3 }
-        },
-        {
-          id: "opposition",
-          name: "反对派",
-          satisfaction: 45,
-          weights: { approval: -0.6, inflation: -0.3, unemployment: -0.3 }
-        },
-        {
-          id: "imf",
-          name: "国际债权人/IMF",
-          satisfaction: 50,
-          weights: { credibility: 0.6, debt: -0.4, fiscalDeficit: -0.4, inflation: -0.2 }
-        }
-      ];
-
-      const policies = [
-        {
-          id: "printMoney",
-          name: "印钱扩表",
-          description: "短期拉动 GDP 与就业，但推高通胀预期并伤害信誉。",
-          cooldown: 1,
-          cost: { approval: -2, credibility: -3 },
-          effects: (state) => {
-            state.moneySupply += 8;
-            state.gdp += 2;
-            state.unemployment -= 1;
-            state.inflationExpectation += 3;
-            state.credibility -= 2;
-          }
-        },
-        {
-          id: "raiseRate",
-          name: "加息 +1%",
-          description: "短期抑制增长、提高失业，但对通胀有滞后抑制并增强信誉。",
-          cooldown: 1,
-          cost: { approval: -1 },
-          effects: (state) => {
-            state.policyRate += 1;
-            state.gdp -= 1.5;
-            state.unemployment += 0.6;
-            state.inflationControlQueue.push({ amount: -2, delay: 2 });
-            if (state.inflation > 25) {
-              state.credibility += 2;
-            }
-          }
-        },
-        {
-          id: "cutRate",
-          name: "降息 -1%",
-          description: "刺激增长与就业，但通胀风险上升且高通胀下信誉受损。",
-          cooldown: 1,
-          cost: { approval: 1, credibility: -1 },
-          effects: (state) => {
-            state.policyRate = Math.max(0, state.policyRate - 1);
-            state.gdp += 1.2;
-            state.unemployment -= 0.4;
-            state.inflationControlQueue.push({ amount: 1.5, delay: 2 });
-            if (state.inflation > 20) {
-              state.credibility -= 2;
-            }
-          }
-        },
-        {
-          id: "austerity",
-          name: "紧缩财政",
-          description: "削减支出与补贴，提升信誉与通胀预期，但打击 GDP 与支持率。",
-          cooldown: 2,
-          cost: { approval: -4 },
-          effects: (state) => {
-            state.gdp -= 2.5;
-            state.unemployment += 1;
-            state.fiscalDeficit = Math.max(0, state.fiscalDeficit - 1.5);
-            state.inflationExpectation -= 2;
-            state.credibility += 2.5;
-          }
-        },
-        {
-          id: "stimulus",
-          name: "补贴刺激",
-          description: "短期拉支持率与 GDP，但增加通胀压力并降低信誉。",
-          cooldown: 2,
-          cost: { credibility: -2 },
-          effects: (state) => {
-            state.gdp += 2.5;
-            state.unemployment -= 1;
-            state.approval += 4;
-            state.fiscalDeficit += 1.2;
-            state.inflationExpectation += 2;
-          }
-        },
-        {
-          id: "capitalControl",
-          name: "资本管制",
-          description: "短期缓解外逃与汇率压力，但损害信誉并滋生黑市。",
-          cooldown: 3,
-          cost: { credibility: -3, approval: -1 },
-          effects: (state) => {
-            state.reserves += 4;
-            state.blackMarketFX += 5;
-            state.credibility -= 3;
-          }
-        }
-      ];
-
-      const events = [
-        {
-          id: "oilShock",
-          name: "油价冲击",
-          headline: "国际油价飙升，输入型通胀扩散",
-          condition: (s) => s.round > 1,
-          weight: (s) => 0.2 + s.inflation / 100,
-          apply: (s, log) => {
-            s.inflation += 4;
-            s.gdp -= 1;
-            log.push("能源进口成本上升，企业利润受挤压。");
-          }
-        },
-        {
-          id: "drought",
-          name: "干旱减产",
-          headline: "主粮减产，食品价格领涨",
-          condition: (s) => s.round > 1,
-          weight: (s) => 0.15 + s.inflationExpectation / 120,
-          apply: (s, log) => {
-            s.inflation += 3;
-            s.gdp -= 1.2;
-            s.approval -= 2;
-          }
-        },
-        {
-          id: "strike",
-          name: "大罢工",
-          headline: "全国性罢工冲击运输与生产",
-          condition: (s) => s.unemployment > 12 || s.approval < 45,
-          weight: (s) => 0.3 + (12 - s.approval) / 100,
-          apply: (s, log) => {
-            s.gdp -= 2;
-            s.approval -= 3;
-            log.push("民众要求工资补偿与就业保障。");
-          }
-        },
-        {
-          id: "protest",
-          name: "街头抗议",
-          headline: "抗议升级，支持率受挫",
-          condition: (s) => s.approval < 50,
-          weight: (s) => 0.25 + (50 - s.approval) / 100,
-          apply: (s, log) => {
-            s.approval -= 4;
-            s.credibility -= 1;
-          }
-        },
-        {
-          id: "bankRun",
-          name: "挤兑现象",
-          headline: "挤兑谣言扩散，金融系统紧张",
-          condition: (s) => s.inflation > 25 || s.bankHealth < 50,
-          weight: (s) => 0.2 + (60 - s.bankHealth) / 100,
-          apply: (s, log) => {
-            s.bankHealth -= 8;
-            s.gdp -= 1.5;
-            s.credibility -= 2;
-            log.push("央行被迫释放流动性。");
-          }
-        },
-        {
-          id: "ratingCut",
-          name: "评级下调",
-          headline: "国际评级下调，融资成本上升",
-          condition: (s) => s.debt > 65 || s.credibility < 40,
-          weight: (s) => 0.25 + (70 - s.credibility) / 120,
-          apply: (s, log) => {
-            s.credibility -= 4;
-            s.reserves -= 4;
-            s.policyRate += 0.5;
-            log.push("外资观望，债券利差走阔。");
-          }
-        },
-        {
-          id: "imfTalks",
-          name: "IMF谈判",
-          headline: "IMF要求改革换取贷款支持",
-          condition: (s) => s.reserves < 40 && s.credibility > 35,
-          weight: (s) => 0.2 + (40 - s.reserves) / 120,
-          apply: (s, log) => {
-            s.reserves += 8;
-            s.credibility += 2;
-            s.fiscalDeficit -= 0.5;
-            log.push("市场短暂松口气，但改革压力加大。");
-          }
-        },
-        {
-          id: "exportBoom",
-          name: "出口回暖",
-          headline: "外需回升，出口企业喘息",
-          condition: (s) => s.gdp < 105,
-          weight: (s) => 0.2,
-          apply: (s) => {
-            s.gdp += 2;
-            s.unemployment -= 0.5;
-          }
-        },
-        {
-          id: "inflationSpiral",
-          name: "抢购潮",
-          headline: "通胀预期失控引发抢购潮",
-          condition: (s) => s.inflation > 30,
-          weight: (s) => 0.35 + s.inflationExpectation / 100,
-          apply: (s, log) => {
-            s.inflation += 6;
-            s.approval -= 5;
-            s.credibility -= 4;
-            log.push("民众提前囤货，市场供需失衡。");
-          }
-        },
-        {
-          id: "blackMarket",
-          name: "黑市汇率飙升",
-          headline: "黑市汇率飙升，资本外逃加剧",
-          condition: (s) => s.blackMarketFX > 25,
-          weight: (s) => 0.2 + s.blackMarketFX / 120,
-          apply: (s, log) => {
-            s.reserves -= 6;
-            s.credibility -= 3;
-            s.bankHealth -= 4;
-            log.push("资本管制带来新的套利空间。");
-          }
-        },
-        {
-          id: "policySuccess",
-          name: "稳定信号",
-          headline: "通胀见顶，市场预期稍有缓和",
-          condition: (s) => s.inflation < 15 && s.credibility > 55,
-          weight: (s) => 0.25,
-          apply: (s, log) => {
-            s.inflationExpectation -= 2;
-            s.approval += 2;
-            log.push("投资者认为政策一致性增强。");
-          }
-        },
-        {
-          id: "bankAid",
-          name: "银行救助",
-          headline: "央行出手托底，银行系统暂稳",
-          condition: (s) => s.bankHealth < 45 && s.reserves > 20,
-          weight: (s) => 0.2,
-          apply: (s) => {
-            s.bankHealth += 10;
-            s.reserves -= 4;
-            s.credibility += 1;
-          }
-        }
-      ];
-
-      const state = {
-        schemaVersion: SCHEMA_VERSION,
-        scenarioId: "default",
-        round: 1,
-        stableTurns: 0,
-        chosenPolicies: [],
-        policyCooldowns: {},
-        logEntries: [],
-        lastIndicators: {},
-        inflationControlQueue: [],
-        factions: JSON.parse(JSON.stringify(factions)),
-        ...scenarios[0].initial
-      };
-
-      const ui = {
-        indicatorGrid: document.getElementById("indicator-grid"),
-        factionList: document.getElementById("faction-list"),
-        log: document.getElementById("log"),
-        policyGrid: document.getElementById("policy-grid"),
-        round: document.getElementById("round"),
-        scenarioName: document.getElementById("scenario-name"),
-        schemaVersion: document.getElementById("schema-version"),
-        policyLimit: document.getElementById("policy-limit"),
-        factionSummary: document.getElementById("faction-summary"),
-        statusTag: document.getElementById("status-tag"),
-        actionHint: document.getElementById("action-hint"),
-        scenarioSelect: document.getElementById("scenario-select"),
-        saveArea: document.getElementById("save-area")
-      };
-
-      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-
-      const formatNumber = (value, suffix = "") => {
-        const rounded = Math.round(value * 10) / 10;
-        return `${rounded}${suffix}`;
-      };
-
-      const updateIndicatorGrid = () => {
-        ui.indicatorGrid.innerHTML = "";
-        indicatorConfig.forEach((indicator) => {
-          const value = state[indicator.key];
-          const previous = state.lastIndicators[indicator.key] ?? value;
-          const delta = Math.round((value - previous) * 10) / 10;
-          const deltaClass = delta > 0 ? "up" : delta < 0 ? "down" : "flat";
-          const deltaSymbol = delta > 0 ? "▲" : delta < 0 ? "▼" : "■";
-          const card = document.createElement("div");
-          card.className = "indicator";
-          card.innerHTML = `
-            <div class="label">${indicator.label}</div>
-            <div class="value">${formatNumber(value, indicator.suffix)}</div>
-            <div class="delta ${deltaClass}">${deltaSymbol} ${delta}</div>
-          `;
-          ui.indicatorGrid.appendChild(card);
-        });
-      };
-
-      const updateFactions = () => {
-        ui.factionList.innerHTML = "";
-        state.factions.forEach((faction) => {
-          const wrapper = document.createElement("div");
-          wrapper.className = "faction";
-          const mood = faction.satisfaction > 60 ? "满意" : faction.satisfaction > 40 ? "观望" : "不满";
-          wrapper.innerHTML = `
-            <div class="faction-header">
-              <span>${faction.name}</span>
-              <span>${Math.round(faction.satisfaction)} / 100 · ${mood}</span>
-            </div>
-            <div class="faction-bar"><span style="width: ${clamp(faction.satisfaction, 0, 100)}%"></span></div>
-          `;
-          ui.factionList.appendChild(wrapper);
-        });
-        const avg = state.factions.reduce((sum, f) => sum + f.satisfaction, 0) / state.factions.length;
-        ui.factionSummary.textContent = avg > 60 ? "多数支持" : avg > 45 ? "分歧明显" : "压力升温";
-      };
-
-      const addLogEntry = (headline, details = []) => {
-        const entry = {
-          round: state.round,
-          headline,
-          details
-        };
-        state.logEntries.unshift(entry);
-        renderLog();
-      };
-
-      const renderLog = () => {
-        ui.log.innerHTML = "";
-        state.logEntries.slice(0, 40).forEach((entry) => {
-          const item = document.createElement("div");
-          item.className = "log-entry";
-          item.innerHTML = `
-            <div class="headline">第 ${entry.round} 回合 · ${entry.headline}</div>
-            ${entry.details.map((line) => `<div>${line}</div>`).join("")}
-          `;
-          ui.log.appendChild(item);
-        });
-      };
-
-      const renderPolicies = () => {
-        ui.policyGrid.innerHTML = "";
-        policies.forEach((policy) => {
-          const card = document.createElement("div");
-          card.className = "policy-card";
-          const cooldown = state.policyCooldowns[policy.id] || 0;
-          const selected = state.chosenPolicies.includes(policy.id);
-          const remaining = cooldown > 0 ? `冷却 ${cooldown} 回合` : "可用";
-          const buttonText = selected ? "已选择" : "选择";
-          const button = document.createElement("button");
-          button.textContent = buttonText;
-          button.className = selected ? "btn-primary" : "btn-secondary";
-          button.disabled = cooldown > 0 || (!selected && state.chosenPolicies.length >= MAX_POLICIES_PER_TURN);
-          button.addEventListener("click", () => togglePolicy(policy.id));
-          card.innerHTML = `
-            <h3>${policy.name}</h3>
-            <p>${policy.description}</p>
-            <div class="meta">冷却：${policy.cooldown} · ${remaining}</div>
-          `;
-          card.appendChild(button);
-          ui.policyGrid.appendChild(card);
-        });
-        ui.policyLimit.textContent = `本回合已选 ${state.chosenPolicies.length}/${MAX_POLICIES_PER_TURN}`;
-      };
-
-      const togglePolicy = (policyId) => {
-        if (state.chosenPolicies.includes(policyId)) {
-          state.chosenPolicies = state.chosenPolicies.filter((id) => id !== policyId);
-        } else if (state.chosenPolicies.length < MAX_POLICIES_PER_TURN) {
-          state.chosenPolicies.push(policyId);
-        }
-        renderPolicies();
-      };
-
-      const applyPolicyCosts = (policy) => {
-        if (!policy.cost) return;
-        Object.entries(policy.cost).forEach(([key, value]) => {
-          if (typeof state[key] === "number") {
-            state[key] += value;
-          }
-        });
-      };
-
-      const applyPolicies = () => {
-        const applied = [];
-        state.chosenPolicies.forEach((policyId) => {
-          const policy = policies.find((p) => p.id === policyId);
-          if (!policy) return;
-          applied.push(policy.name);
-          applyPolicyCosts(policy);
-          policy.effects(state);
-          state.policyCooldowns[policy.id] = policy.cooldown;
-        });
-        if (applied.length === 0) {
-          addLogEntry("内阁暂未出台新政策", ["市场等待信号。"]);
-        } else {
-          addLogEntry("内阁推出政策组合", applied.map((name) => `· ${name}`));
-        }
-        state.chosenPolicies = [];
-      };
-
-      const updateInflationExpectation = () => {
-        const credibilityFactor = (100 - state.credibility) / 100;
-        const moneyImpact = (state.moneySupply - 100) * 0.05;
-        state.inflationExpectation += moneyImpact * (0.6 + credibilityFactor);
-        state.inflationExpectation += (state.inflation - state.inflationExpectation) * 0.2;
-      };
-
-      const applyLaggedControls = () => {
-        state.inflationControlQueue.forEach((item) => {
-          item.delay -= 1;
-          if (item.delay <= 0) {
-            state.inflation += item.amount;
-          }
-        });
-        state.inflationControlQueue = state.inflationControlQueue.filter((item) => item.delay > 0);
-      };
-
-      const updateEconomy = () => {
-        updateInflationExpectation();
-        applyLaggedControls();
-        const expectationGap = state.inflationExpectation - state.inflation;
-        state.inflation += expectationGap * (0.3 + (100 - state.credibility) / 200);
-        state.gdp += (state.moneySupply - 110) * 0.02;
-        state.unemployment += (98 - state.gdp) * 0.03;
-        state.bankHealth += (state.credibility - 50) * 0.02;
-        state.reserves += (state.credibility - 50) * 0.1 - state.blackMarketFX * 0.05;
-        state.blackMarketFX += state.credibility < 40 ? 2 : -1;
-        state.debt += state.fiscalDeficit * 0.4;
-        state.approval += (state.gdp - 100) * 0.1 - state.inflation * 0.05;
-      };
-
-      const pickEvent = () => {
-        const eligible = events.filter((event) => event.condition(state));
-        if (eligible.length === 0) return null;
-        const weighted = eligible.map((event) => ({ event, weight: event.weight(state) }));
-        const total = weighted.reduce((sum, item) => sum + item.weight, 0);
-        let roll = Math.random() * total;
-        for (const item of weighted) {
-          roll -= item.weight;
-          if (roll <= 0) return item.event;
-        }
-        return weighted[weighted.length - 1].event;
-      };
-
-      const triggerEvent = () => {
-        const event = pickEvent();
-        if (!event) return;
-        const details = [];
-        event.apply(state, details);
-        addLogEntry(event.headline, details.length ? details : ["局势出现波动。"]);
-      };
-
-      const updateFactionsFromIndicators = () => {
-        state.factions.forEach((faction) => {
-          let delta = 0;
-          Object.entries(faction.weights).forEach(([key, weight]) => {
-            const value = state[key];
-            delta += value * weight * 0.01;
-          });
-          faction.satisfaction = clamp(faction.satisfaction + delta, 0, 100);
-        });
-      };
-
-      const postFactionFeedback = () => {
-        const notes = [];
-        state.factions.forEach((faction) => {
-          if (faction.satisfaction < 35) {
-            notes.push(`${faction.name}表达强烈不满。`);
-          } else if (faction.satisfaction > 70) {
-            notes.push(`${faction.name}公开支持政府路线。`);
-          }
-        });
-        if (notes.length) {
-          addLogEntry("派系反馈", notes);
-        }
-      };
-
-      const checkVictoryDefeat = () => {
-        if (state.approval <= 0) {
-          return { status: "failed", message: "支持率崩溃，政府下台。" };
-        }
-        if (state.inflation >= 80) {
-          return { status: "failed", message: "恶性通胀失控，经济崩溃。" };
-        }
-        if (state.unemployment >= 25) {
-          return { status: "failed", message: "失业率爆表，社会秩序瓦解。" };
-        }
-        if (state.credibility <= 5) {
-          return { status: "failed", message: "信誉破产，政策失灵引发连锁。" };
-        }
-        if (state.inflation < 10 && state.unemployment < 10) {
-          state.stableTurns += 1;
-        } else {
-          state.stableTurns = 0;
-        }
-        if (state.stableTurns >= STABLE_REQUIRED_TURNS) {
-          return { status: "win", message: "稳定结局：物价与就业恢复稳定。" };
-        }
-        if (state.gdp > 105 && state.inflation < 12) {
-          return { status: "win", message: "复苏结局：经济回升且通胀可控。" };
-        }
-        return null;
-      };
-
-      const enforceBounds = () => {
-        state.gdp = clamp(state.gdp, 60, 140);
-        state.inflation = clamp(state.inflation, 0, 120);
-        state.unemployment = clamp(state.unemployment, 0, 35);
-        state.approval = clamp(state.approval, 0, 100);
-        state.policyRate = clamp(state.policyRate, 0, 30);
-        state.moneySupply = clamp(state.moneySupply, 60, 200);
-        state.inflationExpectation = clamp(state.inflationExpectation, 0, 120);
-        state.credibility = clamp(state.credibility, 0, 100);
-        state.reserves = clamp(state.reserves, 0, 120);
-        state.debt = clamp(state.debt, 0, 120);
-        state.fiscalDeficit = clamp(state.fiscalDeficit, -5, 20);
-        state.blackMarketFX = clamp(state.blackMarketFX, 0, 80);
-        state.bankHealth = clamp(state.bankHealth, 0, 100);
-      };
-
-      const decrementCooldowns = () => {
-        Object.keys(state.policyCooldowns).forEach((policyId) => {
-          state.policyCooldowns[policyId] -= 1;
-          if (state.policyCooldowns[policyId] <= 0) {
-            delete state.policyCooldowns[policyId];
-          }
-        });
-      };
-
-      const endTurn = () => {
-        if (state.chosenPolicies.length === 0) {
-          ui.actionHint.textContent = "至少选择 1 项政策。";
-          ui.actionHint.style.color = "var(--warn)";
-          return;
-        }
-        ui.actionHint.textContent = "处理中...";
-        ui.actionHint.style.color = "var(--muted)";
-
-        state.lastIndicators = {};
-        indicatorConfig.forEach((indicator) => {
-          state.lastIndicators[indicator.key] = state[indicator.key];
-        });
-
-        applyPolicies();
-        updateEconomy();
-        triggerEvent();
-        updateFactionsFromIndicators();
-        postFactionFeedback();
-        enforceBounds();
-        decrementCooldowns();
-
-        const result = checkVictoryDefeat();
-        if (result) {
-          ui.statusTag.textContent = result.status === "win" ? "胜利" : "失败";
-          addLogEntry(result.message, ["游戏结束，请重开或读取存档。"]);
-          ui.actionHint.textContent = "游戏已结束";
-          ui.actionHint.style.color = result.status === "win" ? "var(--good)" : "var(--warn)";
-        } else {
-          ui.statusTag.textContent = "执政中";
-          ui.actionHint.textContent = "等待下一轮决策";
-        }
-
-        state.round += 1;
-        ui.round.textContent = `回合 ${state.round}`;
-        renderAll();
-      };
-
-      const renderAll = () => {
-        ui.round.textContent = `回合 ${state.round}`;
-        const scenario = scenarios.find((s) => s.id === state.scenarioId);
-        ui.scenarioName.textContent = `剧本：${scenario ? scenario.name : "未知"}`;
-        ui.schemaVersion.textContent = state.schemaVersion;
-        updateIndicatorGrid();
-        updateFactions();
-        renderPolicies();
-        renderLog();
-      };
-
-      const resetGame = (scenarioId = state.scenarioId) => {
-        const scenario = scenarios.find((s) => s.id === scenarioId) || scenarios[0];
-        state.schemaVersion = SCHEMA_VERSION;
-        state.scenarioId = scenario.id;
-        state.round = 1;
-        state.stableTurns = 0;
-        state.chosenPolicies = [];
-        state.policyCooldowns = {};
-        state.logEntries = [];
-        state.lastIndicators = {};
-        state.inflationControlQueue = [];
-        state.factions = JSON.parse(JSON.stringify(factions));
-        Object.assign(state, scenario.initial);
-        addLogEntry("新危机剧本已启动", [scenario.description]);
-        renderAll();
-        ui.statusTag.textContent = "执政中";
-        ui.actionHint.textContent = "准备决策";
-        ui.actionHint.style.color = "var(--muted)";
-      };
-
-      const serializeState = () => {
-        return JSON.stringify(
-          {
-            schemaVersion: state.schemaVersion,
-            scenarioId: state.scenarioId,
-            round: state.round,
-            stableTurns: state.stableTurns,
-            chosenPolicies: state.chosenPolicies,
-            policyCooldowns: state.policyCooldowns,
-            logEntries: state.logEntries,
-            lastIndicators: state.lastIndicators,
-            inflationControlQueue: state.inflationControlQueue,
-            factions: state.factions,
-            indicators: indicatorConfig.reduce((acc, indicator) => {
-              acc[indicator.key] = state[indicator.key];
-              return acc;
-            }, {})
-          },
-          null,
-          2
-        );
-      };
-
-      const loadState = (json) => {
-        const data = JSON.parse(json);
-        if (!data || data.schemaVersion !== SCHEMA_VERSION) {
-          throw new Error("存档版本不匹配");
-        }
-        state.schemaVersion = data.schemaVersion;
-        state.scenarioId = data.scenarioId;
-        state.round = data.round;
-        state.stableTurns = data.stableTurns;
-        state.chosenPolicies = data.chosenPolicies || [];
-        state.policyCooldowns = data.policyCooldowns || {};
-        state.logEntries = data.logEntries || [];
-        state.lastIndicators = data.lastIndicators || {};
-        state.inflationControlQueue = data.inflationControlQueue || [];
-        state.factions = data.factions || JSON.parse(JSON.stringify(factions));
-        Object.entries(data.indicators || {}).forEach(([key, value]) => {
-          state[key] = value;
-        });
-        renderAll();
-      };
-
-      const autoSimulate = (turns = 10) => {
-        let count = 0;
-        const simulate = () => {
-          if (count >= turns) return;
-          if (state.chosenPolicies.length === 0) {
-            const available = policies.filter((p) => !(state.policyCooldowns[p.id] > 0));
-            state.chosenPolicies = available
-              .sort(() => Math.random() - 0.5)
-              .slice(0, Math.floor(Math.random() * 3) + 1)
-              .map((p) => p.id);
-          }
-          endTurn();
-          count += 1;
-          if (ui.actionHint.textContent === "游戏已结束") return;
-          setTimeout(simulate, 120);
-        };
-        simulate();
-      };
-
-      const initScenarioSelect = () => {
-        scenarios.forEach((scenario) => {
-          const option = document.createElement("option");
-          option.value = scenario.id;
-          option.textContent = `${scenario.name} - ${scenario.description}`;
-          ui.scenarioSelect.appendChild(option);
-        });
-        ui.scenarioSelect.value = state.scenarioId;
-        ui.scenarioSelect.addEventListener("change", (event) => {
-          resetGame(event.target.value);
-        });
-      };
-
-      document.getElementById("end-turn").addEventListener("click", endTurn);
-      document.getElementById("auto-sim").addEventListener("click", () => autoSimulate(10));
-      document.getElementById("clear-log").addEventListener("click", () => {
-        state.logEntries = [];
-        renderLog();
-      });
-      document.getElementById("reset-btn").addEventListener("click", () => resetGame());
-      document.getElementById("save-btn").addEventListener("click", () => {
-        ui.saveArea.value = serializeState();
-      });
-      document.getElementById("load-btn").addEventListener("click", () => {
-        try {
-          loadState(ui.saveArea.value);
-          addLogEntry("读取存档成功", ["游戏状态已恢复。"]);
-        } catch (error) {
-          addLogEntry("读取存档失败", [error.message]);
-        }
-      });
-
-      initScenarioSelect();
-      resetGame();
-    </script>
+    <div class="modal" id="tutorial-modal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h4 id="tutorial-title">新手教程 · 宏观危机应对</h4>
+          <button class="btn ghost" id="close-tutorial">开始游戏</button>
+        </div>
+        <div class="modal-body">
+          <p id="tutorial-goal"><strong>目标：</strong>在 12 个季度内稳住通胀与就业，同时守住外汇储备与债务。</p>
+          <ul>
+            <li id="tutorial-win"><strong>怎么赢：</strong>连续 4 个季度通胀 ≤ 8%、失业 ≤ 10%、外储 ≥ 4 月。</li>
+            <li id="tutorial-lose"><strong>怎么输：</strong>通胀 > 60%、外储 < 0.5 月或支持率 < 20%。</li>
+            <li id="tutorial-tip"><strong>建议打法：</strong>先用利率和财政缩减锚定预期，逐步恢复增长；偏离泰勒规则会损害信誉。</li>
+          </ul>
+          <p id="tutorial-note">所有变量均为年化百分比（%）或 GDP 比例；每回合=1季度。</p>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
